@@ -1,0 +1,45 @@
+#container {
+    margin: auto;
+    border: 1px solid black;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    max-width: 150px;
+}
+.square {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    background-color: white;
+    font-size: 1.5em;
+}
+.square:hover {
+    background-color: lightgray;
+}
+#display {
+    width: 300px;
+    margin: 10vh auto;
+    text-align: center;
+    font-size: 1.5em;
+}
+#resetBtn {
+    display: block;
+    width: 100px;
+    margin: 5vh auto;
+}
+ul {
+    width: 300px;
+    margin: auto;
+    margin-top: 5vh;
+    list-style: none;
+    
+}
+#reverse-btn {
+    width: 200px;
+}
+#reverse-container {
+    width: 200px;
+    margin: auto;
+    margin-top: 5vh;
+}
