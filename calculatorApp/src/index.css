@@ -13,15 +13,16 @@
     width: 750px;
     margin: auto;
     border-radius: 30px;
-    background-color: #2e2e2e;
+    /*background-color: #2e2e2e;*/
     display: flex;
     justify-content: center;
     align-items: center;
 }
 #main-section {
     border: 1px solid black;
-    background-color: #3a3a3a;
+    /*background-color: #3a3a3a;*/
     height: 95%;
     width: 95%;
     border-radius: 30px;
+    
 }

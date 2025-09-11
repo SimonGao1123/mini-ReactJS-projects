@@ -1,0 +1,70 @@
+* {
+    box-sizing: border-box;
+}
+
+#display-section {
+    border: 1px solid black;
+    height: 114px;
+    width: calc(750*0.95);
+    padding: 10px;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+#screen {
+    border: 1px solid black;
+    height: 100%;
+    width: 100%;
+    border-radius: 30px 30px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 30px;
+}
+#output {
+    overflow-x: scroll;
+    font-size: 3em;
+}
+#input-left {
+    border: 1px solid black;
+    width: calc(0.75*712px);
+    height: calc(0.8*568px);
+    border-bottom-left-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+#input-right {
+    border: 1px solid black;
+    width: calc(0.25*712px);
+    height: calc(0.8*568px);
+    border-bottom-right-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+.input-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+
+}
+#functions {
+    display: flex;
+    
+}
+.btn {
+    height: 64px;
+    width: 145px;
+    border-radius: 30px;
+    font-size: 1.5em;
+}
