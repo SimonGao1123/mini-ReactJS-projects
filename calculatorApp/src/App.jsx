@@ -32,7 +32,7 @@ const buttonFunctions = [
 function Display () { // screen for displaying results (#output), also stores number
     return (
         <div id="screen">
-            <div id="output">123</div>
+            <div id="output">0</div>
         </div>
     );
 }
@@ -40,14 +40,19 @@ function Button ({text, clickF}) { // each button
     return <button class="btn" onClick={clickF}>{text}</button>;
 }
 
-function handleFunction ({text, type}) { // determines which function to run when a button is clicked
+function handleFunction ({text, type}, currVal, ifTemp, setTemp) { // determines which function to run when a button is clicked
     const out = document.getElementById("output");
     switch (type) { // TEMPORARY TESTING
         case "number":
-            out.textContent+=text;
+            if (ifTemp) { // e.g. was 0 or a temp display of result in between longer calculation
+                out.textContent = text;
+                setTemp(false);
+            } else {
+                out.textContent += text;
+            }
             break;
         case "function":
-            out.textContent=""
+            
             break;
         default:
             break;
@@ -64,14 +69,14 @@ function handleFunction ({text, type}) { // determines which function to run whe
 }
 export default function Calculator () { // main function
     const [currVal, setVal] = useState(0);
-    const [ifTemp, setTemp] = useState(false); // to track if a # iis just a temp # displaying prev result
+    const [ifTemp, setTemp] = useState(true); // to track if a # iis just a temp # displaying prev result
     const inputLeftArray = []; // all buttons display loop
     for (let i = 0; i < 6; i++) {
         const rowArray = [];
         for (let j = 0; j < 3; j++) {
             const index = i*3+j;
             rowArray.push(
-                <Button text={buttonFunctions[index].text} clickF={()=>handleFunction(buttonFunctions[index])} key={index}/>
+                <Button text={buttonFunctions[index].text} clickF={()=>handleFunction(buttonFunctions[index], currVal, ifTemp, setTemp)} key={index}/>
             );
         }
         inputLeftArray.push(<div class="input-row">{rowArray}</div>);
@@ -79,7 +84,7 @@ export default function Calculator () { // main function
     const inputrightArray = [];
     for (let i = 18; i<buttonFunctions.length; i++) {
         inputrightArray.push(
-            <Button text={buttonFunctions[i].text} clickF={()=>handleFunction(buttonFunctions[i])} key={i}/>
+            <Button text={buttonFunctions[i].text} clickF={()=>handleFunction(buttonFunctions[i], currVal, ifTemp, setTemp)} key={i}/>
         );
     }
 
