@@ -47,24 +47,33 @@ function handleFunction (
     ifTemp, 
     setTemp, 
     displayVal, 
-    setDisplay
+    setDisplay, 
+    numOp, 
+    setNumOp
     ) { // determines which function to run when a button is clicked
     switch (type) { 
         case "number":
-            if (ifTemp) { // e.g. was 0 or a temp display of result in between longer calculation
+            if (ifTemp) {
+                // temporary number
                 setDisplay(text);
                 setTemp(false);
+                
+
             } else {
                 setDisplay(displayVal + text);
             }
             break;
         case "function":
-            // another switch to determine with function (fix)
-            if (text==="+") {
-                setDisplay(currVal);
-                setTemp(true);
-                setVal(currVal + parseFloat(displayVal));
-            }
+
+            // assume addition for testing
+            
+            setNumOp(parseFloat(displayVal));
+            const result = numOp + parseFloat(displayVal);
+            setVal(result);
+            setDisplay(result); // update states are asynchronous
+            setTemp(true);
+            
+           
 
             break;
         default:
@@ -84,7 +93,7 @@ export default function Calculator () { // main function
     const [currVal, setVal] = useState(0); // track curr # stored
     const [ifTemp, setTemp] = useState(true); // to track if a # is just a temp # displaying prev result
     const [displayVal, setDisplay] = useState("0"); // whever this value's state is changed the display gets updated
-    
+    const [numOp, setNumOp] = useState(0); // saves number that is doing operations
     
     const inputLeftArray = []; // all buttons display loop
     for (let i = 0; i < 6; i++) {
@@ -93,7 +102,7 @@ export default function Calculator () { // main function
             const index = i*3+j;
             rowArray.push(
                 <Button text={buttonFunctions[index].text}
-                clickF={()=>handleFunction(buttonFunctions[index], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay)}
+                clickF={()=>handleFunction(buttonFunctions[index], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
                 key={index}/>
             );
         }
@@ -103,7 +112,7 @@ export default function Calculator () { // main function
     for (let i = 18; i<buttonFunctions.length; i++) {
         inputrightArray.push(
             <Button text={buttonFunctions[i].text} 
-            clickF={()=>handleFunction(buttonFunctions[i], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay)}
+            clickF={()=>handleFunction(buttonFunctions[i], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
             key={i}/>
         );
     }
