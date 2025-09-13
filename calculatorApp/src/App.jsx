@@ -81,8 +81,8 @@ function handleFunction (
     */ 
 }
 export default function Calculator () { // main function
-    const [currVal, setVal] = useState(0);
-    const [ifTemp, setTemp] = useState(true); // to track if a # iis just a temp # displaying prev result
+    const [currVal, setVal] = useState(0); // track curr # stored
+    const [ifTemp, setTemp] = useState(true); // to track if a # is just a temp # displaying prev result
     const [displayVal, setDisplay] = useState("0"); // whever this value's state is changed the display gets updated
     
     
