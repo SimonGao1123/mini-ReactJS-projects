@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 const buttonFunctions = [
@@ -40,6 +40,45 @@ function Button ({text, clickF}) { // each button
     return <button className="btn" onClick={clickF}>{text}</button>;
 }
 
+function handleOperations (
+    op,
+    setVal,
+    currVal, 
+    ifTemp, 
+    setTemp, 
+    displayVal, 
+    setDisplay, 
+    currOp, 
+    setOp) {
+
+    const displayNum = parseFloat(displayVal);
+    if (ifTemp) {
+        return; // hasnt entered number yet
+    }
+    let newCurr;
+    switch (currOp) {
+        case "+":
+            newCurr = displayNum + currVal;
+            setDisplay(String(newCurr));
+            setVal(newCurr);
+            setTemp(true);
+            break;
+        case "-":
+            newCurr = currVal - displayNum;
+            setDisplay(String(newCurr));
+            setVal(newCurr);
+            setTemp(true);
+            break;
+        default:
+            setVal(displayNum);
+    }
+
+    if (op !== "=") {
+        setOp(op);
+    } else {
+        setOp(null);
+    }
+}
 function handleFunction (
     {text, type},
     setVal,
@@ -48,8 +87,9 @@ function handleFunction (
     setTemp, 
     displayVal, 
     setDisplay, 
-    numOp, 
-    setNumOp
+    currOp, 
+    setOp
+    
     ) { // determines which function to run when a button is clicked
     switch (type) { 
         case "number":
@@ -58,23 +98,20 @@ function handleFunction (
                 setDisplay(text);
                 setTemp(false);
                 
-
             } else {
                 setDisplay(displayVal + text);
             }
             break;
         case "function":
-
-            // assume addition for testing
-            
-            setNumOp(parseFloat(displayVal));
-            const result = numOp + parseFloat(displayVal);
-            setVal(result);
-            setDisplay(result); // update states are asynchronous
+            handleOperations(text, setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, currOp, setOp);
+            break;
+        case "clear":
+            setVal(0);
+            setDisplay("0");
             setTemp(true);
-            
-           
-
+            break;
+        case "result":
+            handleOperations(text, setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, currOp, setOp);
             break;
         default:
             break;
@@ -93,8 +130,8 @@ export default function Calculator () { // main function
     const [currVal, setVal] = useState(0); // track curr # stored
     const [ifTemp, setTemp] = useState(true); // to track if a # is just a temp # displaying prev result
     const [displayVal, setDisplay] = useState("0"); // whever this value's state is changed the display gets updated
-    const [numOp, setNumOp] = useState(0); // saves number that is doing operations
-    
+    const [currOp, setOp] = useState(null);
+
     const inputLeftArray = []; // all buttons display loop
     for (let i = 0; i < 6; i++) {
         const rowArray = [];
@@ -102,7 +139,7 @@ export default function Calculator () { // main function
             const index = i*3+j;
             rowArray.push(
                 <Button text={buttonFunctions[index].text}
-                clickF={()=>handleFunction(buttonFunctions[index], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
+                clickF={()=>handleFunction(buttonFunctions[index], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, currOp, setOp)}
                 key={index}/>
             );
         }
@@ -112,7 +149,7 @@ export default function Calculator () { // main function
     for (let i = 18; i<buttonFunctions.length; i++) {
         inputrightArray.push(
             <Button text={buttonFunctions[i].text} 
-            clickF={()=>handleFunction(buttonFunctions[i], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
+            clickF={()=>handleFunction(buttonFunctions[i], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, currOp, setOp)}
             key={i}/>
         );
     }
