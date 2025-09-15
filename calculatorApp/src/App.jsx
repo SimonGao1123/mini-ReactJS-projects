@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import './App.css'
 
+// TODO: IMPLEMENT CHECK IF INPUT IS VALID
 const buttonFunctions = [
     {text:"+/-", type:"signSwitch"},
     {text:"Sqrt", type:"sqrt"},
     {text:"%", type:"percent"},
     {text:"MRC", type:"memoryRecall"},
-    {text:"M-", type:"function"},
-    {text:"M+", type:"function"},
+    {text:"M-", type:"memSub"},
+    {text:"M+", type:"memAdd"},
     {text:"7", type:"number"},
     {text:"8", type:"number"},
     {text:"9", type:"number"},
@@ -40,6 +41,12 @@ function Button ({text, clickF}) { // each button
     return <button className="btn" onClick={clickF}>{text}</button>;
 }
 
+function checkIfDecimalAlreadyExists (displayVal) {
+    // returns true if already exists, false if can still add decimal
+    return displayVal.split("").includes(".");
+    // split turns into array
+}
+
 function handleFunction (
     {text, type},
     prevVal, 
@@ -56,6 +63,14 @@ function handleFunction (
     
     
     switch (type) {
+        case "memAdd":
+            setDisplay(String(parseFloat(displayVal) + memory));
+            setTemp(false);
+            break;
+        case "memSub":
+            setDisplay(String(parseFloat(displayVal) - memory));
+            setTemp(false);
+            break;
         case "percent":
             if (ifTemp) {
                 return;
@@ -76,16 +91,12 @@ function handleFunction (
             setTemp(false);
             break; // TODO fix bug with memory recall
         case "number":
-            if (ifTemp) {
-                // temporary number (displaying result in middle of calculation)
-                setDisplay(text);
-                setTemp(false);
-            } else {
-
-                setDisplay(displayVal + text);
-            }
+            handleNumber(text, displayVal, ifTemp, setTemp, setDisplay);
             break;
         case "result":
+            if (ifTemp) {
+                return;
+            }
             const resDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
             setDisplay(resDisplay);
             setMemory(resDisplay); // saves value for MRC M- and M+
@@ -98,9 +109,8 @@ function handleFunction (
             setDisplay(String(-1*parseFloat(displayVal)));
             break;
         case "function":
-            // test addition
             if (ifTemp) {
-                return; // cannot keep changing operation if nothing
+                return;
             }
             // note display will be altered from last time
             const newDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
@@ -114,12 +124,13 @@ function handleFunction (
             setOperate(null);
             setPrevVal(0);
             setTemp(true);
+            setMemory(0);
         default:
             break;
     }
 
 }
-// only for type="function (returns new display)"
+// only for type="function" and "result" (returns new display)
 function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp) {
     const displayNum = parseFloat(displayVal);
     console.log("test");
@@ -156,6 +167,27 @@ function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, di
             return displayNum;
     }
     return newDisplay;
+}
+// only for type="number"
+function handleNumber (text, displayVal, ifTemp, setTemp, setDisplay) {
+    if (text==="." && checkIfDecimalAlreadyExists(displayVal)) {
+                return; // cant have 2 decimals
+    }
+    if (parseFloat(displayVal) === 0 && text === "0") {
+        return; // avoids repeating 0's
+    }
+    if (parseFloat(displayVal) === 0 && text===".") {
+        setDisplay(displayVal + text);
+        setTemp(false);
+        return;
+    }
+    if (ifTemp) {
+        // temporary number (displaying result in middle of calculation)
+        setDisplay(text);
+        setTemp(false);
+    } else {
+        setDisplay(displayVal + text);
+    }
 }
     
 export default function Calculator () { // main function
