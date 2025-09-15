@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import './App.css'
 
+// TODO: IMPLEMENT CHECK IF INPUT IS VALID
 const buttonFunctions = [
-    {text:"+/-", type:"function"},
-    {text:"Sqrt", type:"function"},
-    {text:"%", type:"function"},
-    {text:"MRC", type:"number"},
-    {text:"M-", type:"function"},
-    {text:"M+", type:"function"},
+    {text:"+/-", type:"signSwitch"},
+    {text:"Sqrt", type:"sqrt"},
+    {text:"%", type:"percent"},
+    {text:"MRC", type:"memoryRecall"},
+    {text:"M-", type:"memSub"},
+    {text:"M+", type:"memAdd"},
     {text:"7", type:"number"},
     {text:"8", type:"number"},
     {text:"9", type:"number"},
@@ -40,61 +41,162 @@ function Button ({text, clickF}) { // each button
     return <button className="btn" onClick={clickF}>{text}</button>;
 }
 
+function checkIfDecimalAlreadyExists (displayVal) {
+    // returns true if already exists, false if can still add decimal
+    return displayVal.split("").includes(".");
+    // split turns into array
+}
+
 function handleFunction (
     {text, type},
-    setVal,
-    currVal, 
+    prevVal, 
+    setPrevVal, 
     ifTemp, 
     setTemp, 
     displayVal, 
     setDisplay, 
-    numOp, 
-    setNumOp
+    currOperate, 
+    setOperate, 
+    memory, 
+    setMemory
     ) { // determines which function to run when a button is clicked
-    switch (type) { 
-        case "number":
+    
+    
+    switch (type) {
+        case "memAdd":
+            setDisplay(String(parseFloat(displayVal) + memory));
+            setTemp(false);
+            break;
+        case "memSub":
+            setDisplay(String(parseFloat(displayVal) - memory));
+            setTemp(false);
+            break;
+        case "percent":
             if (ifTemp) {
-                // temporary number
-                setDisplay(text);
-                setTemp(false);
-                
-
-            } else {
-                setDisplay(displayVal + text);
+                return;
             }
+            setDisplay(String(0.01*parseFloat(displayVal)));
+            break;
+        case "sqrt":
+            if (ifTemp) {
+                return;
+            }
+            setDisplay(String(Math.sqrt(parseFloat(displayVal))));
+            break;
+        case "memoryRecall":
+            if (!memory) {
+                return;
+            }
+            setDisplay(String(memory));
+            setTemp(false);
+            break; // TODO fix bug with memory recall
+        case "number":
+            handleNumber(text, displayVal, ifTemp, setTemp, setDisplay);
+            break;
+        case "result":
+            if (ifTemp) {
+                return;
+            }
+            const resDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
+            setDisplay(resDisplay);
+            setMemory(resDisplay); // saves value for MRC M- and M+
+            setTemp(true);
+            break;
+        case "signSwitch":
+            if (ifTemp) {
+                return;
+            }
+            setDisplay(String(-1*parseFloat(displayVal)));
             break;
         case "function":
-
-            // assume addition for testing
+            if (ifTemp) {
+                return;
+            }
+            // note display will be altered from last time
+            const newDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
             
-            setNumOp(parseFloat(displayVal));
-            const result = numOp + parseFloat(displayVal);
-            setVal(result);
-            setDisplay(result); // update states are asynchronous
+            setPrevVal(newDisplay); // set previous value to display if no previous value tracked
+            setDisplay(String(newDisplay));
             setTemp(true);
-            
-           
-
             break;
+        case "clear":
+            setDisplay("0");
+            setOperate(null);
+            setPrevVal(0);
+            setTemp(true);
+            setMemory(0);
         default:
             break;
     }
-    /* TODO:
-        - Check if number 
-            - if it is a number then add to output (append to string)
-        - if it is a function
-            - follow instructions on ipad
-        - if it is clear then clear past stored and on output
-        - result?
 
-    */ 
 }
-export default function Calculator () { // main function
-    const [currVal, setVal] = useState(0); // track curr # stored
-    const [ifTemp, setTemp] = useState(true); // to track if a # is just a temp # displaying prev result
-    const [displayVal, setDisplay] = useState("0"); // whever this value's state is changed the display gets updated
-    const [numOp, setNumOp] = useState(0); // saves number that is doing operations
+// only for type="function" and "result" (returns new display)
+function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp) {
+    const displayNum = parseFloat(displayVal);
+    console.log("test");
+    if (text !== "=") {
+        setOperate(text); 
+    } else {
+        setOperate(null);// for equals sign reset to beginning
+    }
+
+    console.log("test");
+    let newDisplay;
+    // use switch case in future to calculate with all different functions
+    switch (currOperate) {
+        // bug where when switching between operations will still have old operation since setOperate(text); is async
+        case "+":
+            newDisplay = prevVal + displayNum;
+            break;
+        case "-":
+            newDisplay = prevVal - displayNum;
+            break;
+        case "/":
+            newDisplay = prevVal / displayNum;
+            break;
+        case "X":
+            newDisplay = prevVal * displayNum;
+            break;
+        case "^":
+            newDisplay = Math.pow(prevVal, displayNum);
+            break;
+        default:
+            // first operation (no past), just set values to display
+            setPrevVal(displayNum);
+            setTemp(true);
+            return displayNum;
+    }
+    return newDisplay;
+}
+// only for type="number"
+function handleNumber (text, displayVal, ifTemp, setTemp, setDisplay) {
+    if (text==="." && checkIfDecimalAlreadyExists(displayVal)) {
+                return; // cant have 2 decimals
+    }
+    if (parseFloat(displayVal) === 0 && text === "0") {
+        return; // avoids repeating 0's
+    }
+    if (parseFloat(displayVal) === 0 && text===".") {
+        setDisplay(displayVal + text);
+        setTemp(false);
+        return;
+    }
+    if (ifTemp) {
+        // temporary number (displaying result in middle of calculation)
+        setDisplay(text);
+        setTemp(false);
+    } else {
+        setDisplay(displayVal + text);
+    }
+}
     
+export default function Calculator () { // main function
+    const [prevVal, setPrevVal] = useState(0); // track previous value
+    const [ifTemp, setTemp] = useState(true); // to track if a # is just a temp # displaying prev result
+    const [displayVal, setDisplay] = useState("0"); // holds newest entered value
+    const [currOperate, setOperate] = useState(null); // save past operator
+    const [memory, setMemory] = useState(0); // rememebers the past # saved when pressing "result" function
+
     const inputLeftArray = []; // all buttons display loop
     for (let i = 0; i < 6; i++) {
         const rowArray = [];
@@ -102,7 +204,7 @@ export default function Calculator () { // main function
             const index = i*3+j;
             rowArray.push(
                 <Button text={buttonFunctions[index].text}
-                clickF={()=>handleFunction(buttonFunctions[index], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
+                clickF={()=>handleFunction(buttonFunctions[index], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory)}
                 key={index}/>
             );
         }
@@ -112,7 +214,7 @@ export default function Calculator () { // main function
     for (let i = 18; i<buttonFunctions.length; i++) {
         inputrightArray.push(
             <Button text={buttonFunctions[i].text} 
-            clickF={()=>handleFunction(buttonFunctions[i], setVal, currVal, ifTemp, setTemp, displayVal, setDisplay, numOp, setNumOp)}
+            clickF={()=>handleFunction(buttonFunctions[i], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory)}
             key={i}/>
         );
     }
