@@ -140,14 +140,11 @@ function handleFunction (
 // only for type="function" and "result" (returns new display)
 function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp) {
     const displayNum = parseFloat(displayVal);
-    console.log("test");
     if (text !== "=") {
         setOperate(text); 
     } else {
         setOperate(null);// for equals sign reset to beginning
     }
-
-    console.log("test");
     let newDisplay;
     // use switch case in future to calculate with all different functions
     switch (currOperate) {
