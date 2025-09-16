@@ -24,7 +24,7 @@ const buttonFunctions = [
 
     {text:"^", type:"function"},
     {text:"/", type:"function"},
-    {text:"X", type:"function"},
+    {text:"×", type:"function"},
     {text:"-", type:"function"},
     {text:"+", type:"function"},
     {text:"=", type:"result"},
@@ -107,7 +107,6 @@ function handleFunction (
             const resDisplay = roundNum(handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp));
             setDisplay(resDisplay);
             setMemory(parseFloat(resDisplay)); // saves value for MRC M- and M+
-            setTemp(true);
             break;
         case "signSwitch":
             if (ifTemp) {
