@@ -24,7 +24,7 @@ const buttonFunctions = [
 
     {text:"^", type:"function"},
     {text:"/", type:"function"},
-    {text:"X", type:"function"},
+    {text:"×", type:"function"},
     {text:"-", type:"function"},
     {text:"+", type:"function"},
     {text:"=", type:"result"},
@@ -40,7 +40,14 @@ function Display ({displayVal}) { // screen for displaying results (#output), al
 function Button ({text, clickF}) { // each button
     return <button className="btn" onClick={clickF}>{text}</button>;
 }
-
+function roundNum (num, decimals = 10) {
+    // takes float and rounds to avoid floating point error (decimals is automatically to 10, can customize)
+    let rounded = num.toFixed(decimals);
+    if (rounded.includes(".")) {
+        rounded = rounded.replace(/\.?0+$/, ""); // replaces all trailing 0s and the decimal point if necessary
+    }
+    return rounded;
+}
 function checkIfDecimalAlreadyExists (displayVal) {
     // returns true if already exists, false if can still add decimal
     return displayVal.split("").includes(".");
@@ -75,13 +82,13 @@ function handleFunction (
             if (ifTemp) {
                 return;
             }
-            setDisplay(String(0.01*parseFloat(displayVal)));
+            setDisplay(roundNum((0.01*parseFloat(displayVal))));
             break;
         case "sqrt":
             if (ifTemp) {
                 return;
             }
-            setDisplay(String(Math.sqrt(parseFloat(displayVal))));
+            setDisplay(roundNum((Math.sqrt(parseFloat(displayVal)))));
             break;
         case "memoryRecall":
             if (!memory) {
@@ -97,10 +104,9 @@ function handleFunction (
             if (ifTemp) {
                 return;
             }
-            const resDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
+            const resDisplay = roundNum(handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp));
             setDisplay(resDisplay);
-            setMemory(resDisplay); // saves value for MRC M- and M+
-            setTemp(true);
+            setMemory(parseFloat(resDisplay)); // saves value for MRC M- and M+
             break;
         case "signSwitch":
             if (ifTemp) {
@@ -110,13 +116,14 @@ function handleFunction (
             break;
         case "function":
             if (ifTemp) {
+                setOperate(text); // set operate to function if they decide change midway
                 return;
             }
             // note display will be altered from last time
-            const newDisplay = handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp);
+            const newDisplay = roundNum(handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, displayVal, setTemp));
             
-            setPrevVal(newDisplay); // set previous value to display if no previous value tracked
-            setDisplay(String(newDisplay));
+            setPrevVal(parseFloat(newDisplay)); // set previous value to display if no previous value tracked
+            setDisplay(newDisplay);
             setTemp(true);
             break;
         case "clear":
@@ -125,6 +132,7 @@ function handleFunction (
             setPrevVal(0);
             setTemp(true);
             setMemory(0);
+            break;
         default:
             break;
     }
@@ -154,7 +162,7 @@ function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, di
         case "/":
             newDisplay = prevVal / displayNum;
             break;
-        case "X":
+        case "×":
             newDisplay = prevVal * displayNum;
             break;
         case "^":
