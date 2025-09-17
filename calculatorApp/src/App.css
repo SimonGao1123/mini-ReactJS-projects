@@ -73,14 +73,19 @@
     color: white;
     background: radial-gradient(circle, #2e2e2e 55%, #4a4a4a);    
     border: 1px solid rgb(212, 192, 175);
-    box-shadow: 0 5px 0 black;
+    box-shadow: 0 7px 0 black;
+    transition: 0.3 all ease-in;
+
 }
 
 .btn:hover {
     cursor: pointer;
-    transform: scale(1.04);
+    transform: scale(1.02);
+    transition: 0.3 all ease-in;
 }
 .btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 black;
+    transform: translateY(2px);
+    box-shadow: 0 3px 0 black;
+    transition: 0.3 all ease-in;
+
 }
