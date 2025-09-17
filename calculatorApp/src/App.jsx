@@ -65,9 +65,14 @@ function handleFunction (
     currOperate, 
     setOperate, 
     memory, 
-    setMemory
+    setMemory, 
+    ifSecondClear, 
+    setIfSecondClear
     ) { // determines which function to run when a button is clicked
     
+    if (type !== "clear" && ifSecondClear) {
+        setIfSecondClear(false); // didn't click clear twice in a row
+    }
     
     switch (type) {
         case "memAdd":
@@ -127,11 +132,17 @@ function handleFunction (
             setTemp(true);
             break;
         case "clear":
+            if (ifSecondClear) {
+                setMemory(0); // reset memory too if clear is clicked twice in a row
+                setIfSecondClear(false);
+            } else {
+                setIfSecondClear(true);
+            }
+            
             setDisplay("0");
             setOperate(null);
             setPrevVal(0);
             setTemp(true);
-            setMemory(0);
             break;
         default:
             break;
@@ -204,7 +215,8 @@ export default function Calculator () { // main function
     const [displayVal, setDisplay] = useState("0"); // holds newest entered value
     const [currOperate, setOperate] = useState(null); // save past operator
     const [memory, setMemory] = useState(0); // rememebers the past # saved when pressing "result" function
-
+    const [ifSecondClear, setIfSecondClear] = useState(false); // if clear clicked twice without any other button then clears memory too
+    // for functions will track previous value and display value (which is also input value) and then alters the numbers to form a newDisplay value depending on the function
     const inputLeftArray = []; // all buttons display loop
     for (let i = 0; i < 6; i++) {
         const rowArray = [];
@@ -212,7 +224,7 @@ export default function Calculator () { // main function
             const index = i*3+j;
             rowArray.push(
                 <Button text={buttonFunctions[index].text}
-                clickF={()=>handleFunction(buttonFunctions[index], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory)}
+                clickF={()=>handleFunction(buttonFunctions[index], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory, ifSecondClear, setIfSecondClear)}
                 key={index}/>
             );
         }
@@ -222,7 +234,7 @@ export default function Calculator () { // main function
     for (let i = 18; i<buttonFunctions.length; i++) {
         inputrightArray.push(
             <Button text={buttonFunctions[i].text} 
-            clickF={()=>handleFunction(buttonFunctions[i], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory)}
+            clickF={()=>handleFunction(buttonFunctions[i], prevVal, setPrevVal, ifTemp, setTemp, displayVal, setDisplay, currOperate, setOperate, memory, setMemory, ifSecondClear, setIfSecondClear)}
             key={i}/>
         );
     }
