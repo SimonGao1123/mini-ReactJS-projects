@@ -116,6 +116,7 @@ function handleFunction (
             break;
         case "function":
             if (ifTemp) {
+                setOperate(text); // set operate to function if they decide change midway
                 return;
             }
             // note display will be altered from last time
@@ -131,6 +132,7 @@ function handleFunction (
             setPrevVal(0);
             setTemp(true);
             setMemory(0);
+            break;
         default:
             break;
     }
@@ -160,7 +162,7 @@ function handleOperation (text, currOperate, setOperate, prevVal, setPrevVal, di
         case "/":
             newDisplay = prevVal / displayNum;
             break;
-        case "X":
+        case "×":
             newDisplay = prevVal * displayNum;
             break;
         case "^":
